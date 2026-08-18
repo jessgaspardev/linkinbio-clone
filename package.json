@@ -39,6 +39,7 @@
         "@sveltejs/vite-plugin-svelte": "^7.0.0",
         "bits-ui": "^2.15.0",
         "clsx": "^2.1.1",
+        "daisyui": "^5.7.18",
         "laravel-vite-plugin": "^3.0.0",
         "lucide-svelte": "^0.468.0",
         "svelte": "^5.16.0",
