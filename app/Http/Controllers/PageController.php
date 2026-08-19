@@ -52,4 +52,14 @@ class PageController extends Controller
 
         return redirect()->back();
     }
+
+    public function show(Page $page)
+    {
+        $this->authorize('view', $page);
+
+        return Inertia::render('Pages/Show', [
+            'page' => $page,
+            'links' => $page->links,
+        ]);
+    }
 }

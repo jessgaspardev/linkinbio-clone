@@ -1,5 +1,5 @@
 <script lang="ts">
-import { useForm, router } from '@inertiajs/svelte';
+import { useForm, router, Link } from '@inertiajs/svelte';
 import * as pagesRoutes from '@/routes/pages';
 
 type PageRecord = { id: string; title: string; slug: string; theme: string };
@@ -14,8 +14,6 @@ function submit() {
     });
 }
 
-// Local drafts, keyed by page id. Only exists for a page once the user has
-// actually typed a change; falls back to the real page values otherwise.
 let drafts = $state<Record<string, { title: string; slug: string }>>({});
 let fieldErrors = $state<Record<string, { title?: string; slug?: string }>>({});
 let saving = $state<Record<string, boolean>>({});
@@ -103,6 +101,9 @@ function destroyPage(page: PageRecord) {
                             oninput={(e) => setDraftField(page, 'title', e.currentTarget.value)}
                             class="input input-bordered flex-1 bg-base-100 text-base-content"
                         />
+                        <Link href={pagesRoutes.show({ page: page.id }).url} class="btn btn-ghost btn-sm">
+                            Manage links
+                        </Link>
                         <button
                             onclick={() => destroyPage(page)}
                             class="btn btn-error btn-outline btn-sm"

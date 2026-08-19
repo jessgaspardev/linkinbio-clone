@@ -49,4 +49,9 @@ class Page extends Model
                 ->ignore($ignoreId),
         ];
     }
+
+    public function links() 
+    {
+        return $this->hasMany(Link::class)->orderBy('position');
+    }
 }
