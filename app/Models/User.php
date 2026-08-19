@@ -47,4 +47,9 @@ class User extends Authenticatable implements PasskeyUser
             'two_factor_confirmed_at' => 'datetime',
         ];
     }
+
+    public function pages()
+    {
+        return $this->hasMany(Page::class);
+    }
 }
