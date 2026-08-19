@@ -11,6 +11,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('pages', PageController::class)->except(['create', 'edit']);
 
     Route::post('/pages/{page}/links', [LinkController::class, 'store']);
+    Route::patch('/pages/{page}/links/reorder', [LinkController::class, 'reorder']);
     Route::patch('/pages/{page}/links/{link}', [LinkController::class, 'update']);
     Route::delete('/pages/{page}/links/{link}', [LinkController::class, 'destroy']);
 });

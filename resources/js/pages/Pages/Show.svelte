@@ -1,5 +1,6 @@
 <script lang="ts">
 import { useForm, router, Link } from '@inertiajs/svelte';
+import { dragHandleZone, dragHandle } from 'svelte-dnd-action';
 import LinkController from '@/actions/App/Http/Controllers/LinkController';
 import * as pagesRoutes from '@/routes/pages';
 
@@ -13,6 +14,39 @@ const form = useForm({ label: '', url: '' });
 function submit() {
     form.post(LinkController.store({ page: page.id }).url, {
         onSuccess: () => form.reset(),
+    });
+}
+
+// Local, reorderable copy of the links list. Synced from the `links` prop
+// whenever it changes (after any add/edit/delete/reorder round-trip).
+let linksList = $derived([...links]);
+
+$effect(() => {
+    linksList = [...links];
+});
+
+let reorderError = $state<string | null>(null);
+
+function handleConsider(e: CustomEvent<{ items: LinkRecord[] }>) {
+    linksList = e.detail.items;
+}
+
+function handleFinalize(e: CustomEvent<{ items: LinkRecord[] }>) {
+    linksList = e.detail.items;
+    saveOrder();
+}
+
+function saveOrder() {
+    const linkIds = linksList.map((l) => l.id);
+
+    router.patch(LinkController.reorder({ page: page.id }).url, { link_ids: linkIds }, {
+        preserveScroll: true,
+        onError: () => {
+            reorderError = "Couldn't save the new order — reloading.";
+            router.reload({ onFinish: () => { 
+                reorderError = null; 
+            } });
+        },
     });
 }
 
@@ -78,7 +112,7 @@ function destroyLink(link: LinkRecord) {
         <p class="mt-1 font-mono text-sm text-base-content/60">/{page.slug}</p>
 
         <form
-            onsubmit={(e) => { 
+            onsubmit={(e) => {
                 e.preventDefault(); submit(); 
                 }}
             class="mt-8 flex flex-col gap-2 sm:flex-row"
@@ -106,10 +140,33 @@ function destroyLink(link: LinkRecord) {
             <p class="mt-1 text-sm text-error">{form.errors.url}</p>
         {/if}
 
-        <ul class="mt-8 flex flex-col gap-3">
-            {#each links as link (link.id)}
+        {#if reorderError}
+            <p class="mt-4 text-sm text-error">{reorderError}</p>
+        {/if}
+
+        <ul
+            use:dragHandleZone={{ items: linksList, flipDurationMs: 200 }}
+            onconsider={handleConsider}
+            onfinalize={handleFinalize}
+            class="mt-8 flex flex-col gap-3"
+        >
+            {#each linksList as link (link.id)}
                 <li class="card bg-base-200 p-4">
                     <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
+                        <div
+                            use:dragHandle
+                            aria-label="Reorder {link.label}"
+                            class="touch-none cursor-grab px-1 text-base-content/50"
+                        >
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                                <circle cx="5" cy="3" r="1.3" />
+                                <circle cx="11" cy="3" r="1.3" />
+                                <circle cx="5" cy="8" r="1.3" />
+                                <circle cx="11" cy="8" r="1.3" />
+                                <circle cx="5" cy="13" r="1.3" />
+                                <circle cx="11" cy="13" r="1.3" />
+                            </svg>
+                        </div>
                         <input
                             type="text"
                             value={drafts[link.id]?.label ?? link.label}
