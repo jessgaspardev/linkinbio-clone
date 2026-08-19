@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Page;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Illuminate\Validation\Rule;
 
 class PageController extends Controller
 {
@@ -60,6 +61,29 @@ class PageController extends Controller
         return Inertia::render('Pages/Show', [
             'page' => $page,
             'links' => $page->links,
+            'availableThemes' => config('page-themes'),
         ]);
+    }
+
+    public function toggleVisibility(Page $page)
+    {
+        $this->authorize('update', $page);
+    
+        $page->update(['is_public' => ! $page->is_public]);
+    
+        return redirect()->back();
+    }
+
+    public function setTheme(Request $request, Page $page)
+    {
+        $this->authorize('update', $page);
+
+        $validated = $request->validate([
+            'theme' => ['required', 'string', Rule::in(array_keys(config('page-themes')))],
+        ]);
+
+        $page->update(['theme' => $validated['theme']]);
+
+        return redirect()->back();
     }
 }

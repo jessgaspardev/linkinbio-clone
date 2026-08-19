@@ -2,12 +2,35 @@
 import { useForm, router, Link } from '@inertiajs/svelte';
 import { dragHandleZone, dragHandle } from 'svelte-dnd-action';
 import LinkController from '@/actions/App/Http/Controllers/LinkController';
+import PageController from '@/actions/App/Http/Controllers/PageController';
 import * as pagesRoutes from '@/routes/pages';
 
-type PageRecord = { id: string; title: string; slug: string; theme: string };
+type PageRecord = { id: string; title: string; slug: string; theme: string; is_public: boolean };
 type LinkRecord = { id: string; page_id: string; label: string; url: string; position: number };
 
-let { page, links }: { page: PageRecord; links: LinkRecord[] } = $props();
+let { page, links, availableThemes }: { page: PageRecord; links: LinkRecord[]; availableThemes: Record<string, string> } = $props();
+
+let togglingVisibility = $state(false);
+
+function toggleVisibility() {
+    togglingVisibility = true;
+    router.patch(PageController.toggleVisibility({ page: page.id }).url, {}, {
+        onFinish: () => { 
+            togglingVisibility = false; 
+        },
+    });
+}
+
+let settingTheme = $state(false);
+
+function setTheme(theme: string) {
+    settingTheme = true;
+    router.patch(PageController.setTheme({ page: page.id }).url, { theme }, {
+        onFinish: () => { 
+            settingTheme = false; 
+        },
+    });
+}
 
 const form = useForm({ label: '', url: '' });
 
@@ -17,13 +40,10 @@ function submit() {
     });
 }
 
-// Local, reorderable copy of the links list. Synced from the `links` prop
-// whenever it changes (after any add/edit/delete/reorder round-trip).
+// Local, reorderable copy of the links list. A writable $derived: it tracks
+// `links` automatically, but stays directly assignable during a drag — the
+// override sticks until `links` changes again, then the derivation retakes over.
 let linksList = $derived([...links]);
-
-$effect(() => {
-    linksList = [...links];
-});
 
 let reorderError = $state<string | null>(null);
 
@@ -111,8 +131,28 @@ function destroyLink(link: LinkRecord) {
         <h1 class="font-display mt-2 text-3xl font-bold text-base-content">{page.title}</h1>
         <p class="mt-1 font-mono text-sm text-base-content/60">/{page.slug}</p>
 
+        <button
+            onclick={toggleVisibility}
+            disabled={togglingVisibility}
+            class="btn btn-sm mt-3 {page.is_public ? 'btn-primary' : 'btn-outline'}"
+        >
+            {page.is_public ? 'Public' : 'Private'}
+        </button>
+
+        <div class="mt-3 flex flex-wrap gap-2">
+            {#each Object.entries(availableThemes) as [key, label] (key)}
+                <button
+                    onclick={() => setTheme(key)}
+                    disabled={settingTheme}
+                    class="btn btn-sm {page.theme === key ? 'btn-primary' : 'btn-outline'}"
+                >
+                    {label}
+                </button>
+            {/each}
+        </div>
+
         <form
-            onsubmit={(e) => {
+            onsubmit={(e) => { 
                 e.preventDefault(); submit(); 
                 }}
             class="mt-8 flex flex-col gap-2 sm:flex-row"

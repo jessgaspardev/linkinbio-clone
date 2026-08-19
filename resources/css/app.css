@@ -1,6 +1,5 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
-@import url('https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@400;600;700&family=Libre+Franklin:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap');
 
 @plugin "daisyui/index.js" {
     themes: false;
@@ -51,6 +50,51 @@
     --noise: 0;
 }
 
+@plugin "daisyui/theme" {
+    name: "midnight";
+    default: false;
+    prefersdark: false;
+    color-scheme: dark;
+
+    --color-base-100: #1A1D24;
+    --color-base-200: #23272F;
+    --color-base-300: #363C46;
+    --color-base-content: #EDEDED;
+
+    --color-primary: #4FD1C5;
+    --color-primary-content: #1A1D24;
+
+    --color-secondary: #8B8FE8;
+    --color-secondary-content: #1A1D24;
+
+    --color-accent: #F0B429;
+    --color-accent-content: #1A1D24;
+
+    --color-neutral: #23272F;
+    --color-neutral-content: #EDEDED;
+
+    --color-info: #5B9BD5;
+    --color-info-content: #1A1D24;
+
+    --color-success: #48BB78;
+    --color-success-content: #1A1D24;
+
+    --color-warning: #F0B429;
+    --color-warning-content: #1A1D24;
+
+    --color-error: #F56565;
+    --color-error-content: #1A1D24;
+
+    --radius-selector: 0.5rem;
+    --radius-field: 0.5rem;
+    --radius-box: 0.75rem;
+    --size-selector: 0.25rem;
+    --size-field: 0.25rem;
+    --border: 1px;
+    --depth: 0;
+    --noise: 0;
+}
+
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 
@@ -58,11 +102,9 @@
 
 @theme inline {
     --font-sans:
-        'Libre Franklin', ui-sans-serif, system-ui, sans-serif,
+        Instrument Sans, ui-sans-serif, system-ui, sans-serif,
         'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
         'Noto Color Emoji';
-    --font-display: 'Zilla Slab', ui-serif, Georgia, serif;
-    --font-mono: 'Space Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
 
     --radius-lg: var(--radius);
     --radius-md: calc(var(--radius) - 2px);
@@ -134,11 +176,9 @@
     body,
     html {
         --font-sans:
-        'Libre Franklin', ui-sans-serif, system-ui, sans-serif,
-        'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
-        'Noto Color Emoji';
-        --font-display: 'Zilla Slab', ui-serif, Georgia, serif;
-        --font-mono: 'Space Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+            'Instrument Sans', ui-sans-serif, system-ui, sans-serif,
+            'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
+            'Noto Color Emoji';
     }
 }
 

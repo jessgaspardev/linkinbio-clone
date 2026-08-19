@@ -6,4 +6,6 @@ return [
     'login', 'logout', 'register', 'signup', 'signin',
     'dashboard', 'settings', 'billing', 'account',
     'terms', 'privacy', 'share', 'public', 'gallery',
+    'pages', 'user', 'storage', 'reset-password', 'email',
+    '_boost', '_inertia',
 ];
