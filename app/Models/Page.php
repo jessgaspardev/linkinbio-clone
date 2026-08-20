@@ -11,7 +11,7 @@ class Page extends Model
 {
     use HasUlids;
 
-    protected $fillable = ['title', 'slug', 'theme', 'is_public'];
+    protected $fillable = ['title', 'slug', 'theme', 'is_public', 'is_listed'];
 
     public function user()
     {

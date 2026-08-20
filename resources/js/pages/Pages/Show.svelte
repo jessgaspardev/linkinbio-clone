@@ -5,7 +5,7 @@ import LinkController from '@/actions/App/Http/Controllers/LinkController';
 import PageController from '@/actions/App/Http/Controllers/PageController';
 import * as pagesRoutes from '@/routes/pages';
 
-type PageRecord = { id: string; title: string; slug: string; theme: string; is_public: boolean };
+type PageRecord = { id: string; title: string; slug: string; theme: string; is_public: boolean; is_listed: boolean };
 type LinkRecord = { id: string; page_id: string; label: string; url: string; position: number };
 
 let { page, links, availableThemes }: { page: PageRecord; links: LinkRecord[]; availableThemes: Record<string, string> } = $props();
@@ -17,6 +17,17 @@ function toggleVisibility() {
     router.patch(PageController.toggleVisibility({ page: page.id }).url, {}, {
         onFinish: () => { 
             togglingVisibility = false; 
+        },
+    });
+}
+
+let togglingListed = $state(false);
+
+function toggleListed() {
+    togglingListed = true;
+    router.patch(PageController.toggleListed({ page: page.id }).url, {}, {
+        onFinish: () => { 
+            togglingListed = false; 
         },
     });
 }
@@ -138,6 +149,17 @@ function destroyLink(link: LinkRecord) {
         >
             {page.is_public ? 'Public' : 'Private'}
         </button>
+
+        <button
+            onclick={toggleListed}
+            disabled={togglingListed || !page.is_public}
+            class="btn btn-sm mt-3 ml-2 {page.is_listed ? 'btn-primary' : 'btn-outline'}"
+        >
+            {page.is_listed ? 'Listed' : 'Unlisted'}
+        </button>
+        {#if !page.is_public}
+            <p class="mt-1 text-xs text-base-content/50">Make this page public to list it in the gallery.</p>
+        {/if}
 
         <div class="mt-3 flex flex-wrap gap-2">
             {#each Object.entries(availableThemes) as [key, label] (key)}

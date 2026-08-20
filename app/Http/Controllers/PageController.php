@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Page;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
 use Illuminate\Validation\Rule;
+use Inertia\Inertia;
 
 class PageController extends Controller
 {
@@ -31,6 +31,17 @@ class PageController extends Controller
         return redirect()->back();
     }
 
+    public function show(Page $page)
+    {
+        $this->authorize('view', $page);
+
+        return Inertia::render('Pages/Show', [
+            'page' => $page,
+            'links' => $page->links,
+            'availableThemes' => config('page-themes'),
+        ]);
+    }
+
     public function update(Request $request, Page $page)
     {
         $this->authorize('update', $page);
@@ -45,32 +56,31 @@ class PageController extends Controller
         return redirect()->back();
     }
 
-    public function destroy(Page $page)
+    public function toggleVisibility(Page $page)
     {
-        $this->authorize('delete', $page);
+        $this->authorize('update', $page);
 
-        $page->delete();
+        $isPublic = ! $page->is_public;
+
+        $page->update([
+            'is_public' => $isPublic,
+            // Going private also un-lists the page — being listed is a bigger
+            // promise than being link-shareable, and shouldn't silently
+            // survive a trip through "private" without being re-chosen.
+            'is_listed' => $isPublic ? $page->is_listed : false,
+        ]);
 
         return redirect()->back();
     }
 
-    public function show(Page $page)
-    {
-        $this->authorize('view', $page);
-
-        return Inertia::render('Pages/Show', [
-            'page' => $page,
-            'links' => $page->links,
-            'availableThemes' => config('page-themes'),
-        ]);
-    }
-
-    public function toggleVisibility(Page $page)
+    public function toggleListed(Page $page)
     {
         $this->authorize('update', $page);
-    
-        $page->update(['is_public' => ! $page->is_public]);
-    
+
+        abort_unless($page->is_public, 422, 'Make the page public before listing it.');
+
+        $page->update(['is_listed' => ! $page->is_listed]);
+
         return redirect()->back();
     }
 
@@ -83,6 +93,15 @@ class PageController extends Controller
         ]);
 
         $page->update(['theme' => $validated['theme']]);
+
+        return redirect()->back();
+    }
+
+    public function destroy(Page $page)
+    {
+        $this->authorize('delete', $page);
+
+        $page->delete();
 
         return redirect()->back();
     }

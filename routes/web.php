@@ -11,6 +11,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('dashboard', 'Dashboard')->name('dashboard');
     Route::resource('pages', PageController::class)->except(['create', 'edit']);
     Route::patch('/pages/{page}/visibility', [PageController::class, 'toggleVisibility']);
+    Route::patch('/pages/{page}/listed', [PageController::class, 'toggleListed']);
     Route::patch('/pages/{page}/theme', [PageController::class, 'setTheme']);
     Route::post('/pages/{page}/links', [LinkController::class, 'store']);
     Route::patch('/pages/{page}/links/reorder', [LinkController::class, 'reorder']);
