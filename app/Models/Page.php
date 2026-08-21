@@ -54,4 +54,9 @@ class Page extends Model
     {
         return $this->hasMany(Link::class)->orderBy('position');
     }
+
+    public function reports()
+    {
+        return $this->hasMany(Report::class);
+    }
 }

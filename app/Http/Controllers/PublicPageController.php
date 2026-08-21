@@ -18,6 +18,7 @@ class PublicPageController extends Controller
             'username' => $username,
             'page' => [
                 'title' => $page->title,
+                'slug' => $page->slug,
                 'theme' => $page->theme,
             ],
             'links' => $page->links->map(fn ($link) => [

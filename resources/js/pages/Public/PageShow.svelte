@@ -2,9 +2,36 @@
 import AppHead from '@/components/AppHead.svelte';
 
 type LinkItem = { id: string; label: string; url: string };
-type PageData = { title: string; theme: string };
+type PageData = { title: string; slug: string; theme: string };
 
 let { username, page, links }: { username: string; page: PageData; links: LinkItem[] } = $props();
+
+let reportStatus = $state<'idle' | 'sending' | 'sent' | 'error'>('idle');
+
+async function reportPage() {
+    const reason = prompt("What's wrong with this page? (optional)");
+
+    if (reason === null) {
+        return;
+    }
+
+    reportStatus = 'sending';
+
+    try {
+        const response = await fetch(`/api/${username}/${page.slug}/report`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+            },
+            body: JSON.stringify({ reason: reason || null }),
+        });
+
+        reportStatus = response.ok ? 'sent' : 'error';
+    } catch {
+        reportStatus = 'error';
+    }
+}
 </script>
 
 <AppHead title={page.title} />
@@ -40,5 +67,22 @@ let { username, page, links }: { username: string; page: PageData; links: LinkIt
         <p class="mt-6 text-center text-xs text-base-content/40">
             Made with linkinbio
         </p>
+
+        <div class="mt-2 text-center">
+            {#if reportStatus === 'sent'}
+                <p class="text-xs text-base-content/40">Thanks, this page has been reported.</p>
+            {:else}
+                <button
+                    onclick={reportPage}
+                    disabled={reportStatus === 'sending'}
+                    class="text-xs text-base-content/30 underline hover:text-base-content/50"
+                >
+                    Report this page
+                </button>
+                {#if reportStatus === 'error'}
+                    <p class="mt-1 text-xs text-error">Something went wrong — try again later.</p>
+                {/if}
+            {/if}
+        </div>
     </div>
 </div>
