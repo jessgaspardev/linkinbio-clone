@@ -34,5 +34,7 @@ return [
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
     ],
-
+    'stripe' => [
+        'price_pro' => env('STRIPE_PRICE_PRO'),
+    ]
 ];

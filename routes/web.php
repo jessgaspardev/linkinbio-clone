@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\LinkController;
 use App\Http\Controllers\PageController;
+use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\PublicPageController;
 use Illuminate\Support\Facades\Route;
 
@@ -17,6 +18,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/pages/{page}/links/reorder', [LinkController::class, 'reorder']);
     Route::patch('/pages/{page}/links/{link}', [LinkController::class, 'update']);
     Route::delete('/pages/{page}/links/{link}', [LinkController::class, 'destroy']);
+    Route::post('/subscribe', [SubscriptionController::class, 'upgrade']);
+    Route::post('/billing-portal', [SubscriptionController::class, 'portal']);
 });
 
 require __DIR__.'/settings.php';

@@ -4,7 +4,7 @@ import * as pagesRoutes from '@/routes/pages';
 
 type PageRecord = { id: string; title: string; slug: string; theme: string };
 
-let { pages, username }: { pages: PageRecord[]; username: string } = $props();
+let { pages, username, subscribed }: { pages: PageRecord[]; username: string; subscribed: boolean } = $props();
 
 const form = useForm({ title: '' });
 
@@ -66,7 +66,12 @@ function destroyPage(page: PageRecord) {
 }
 </script>
 
-<div class="min-h-screen bg-base-100 px-6 py-10">
+<button
+    onclick={() => router.post(subscribed ? '/billing-portal' : '/subscribe')}
+    class="btn btn-primary btn-sm"
+>
+    {subscribed ? 'Manage billing' : 'Upgrade to Pro'}
+</button>
     <div class="mx-auto max-w-2xl">
         <h1 class="font-display text-3xl font-bold text-base-content">Your pages</h1>
         <p class="mt-1 text-sm text-base-content/70">Every link-in-bio page you've built.</p>
@@ -148,4 +153,3 @@ function destroyPage(page: PageRecord) {
             {/each}
         </ul>
     </div>
-</div>

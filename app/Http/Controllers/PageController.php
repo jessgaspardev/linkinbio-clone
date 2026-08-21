@@ -14,6 +14,7 @@ class PageController extends Controller
         return Inertia::render('Pages/Index', [
             'pages' => auth()->user()->pages()->latest()->get(),
             'username' => auth()->user()->username,
+            'subscribed' => auth()->user()->subscribed('default'),
         ]);
     }
 
